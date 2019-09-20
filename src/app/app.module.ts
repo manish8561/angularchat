@@ -4,19 +4,19 @@ import {FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ChatliveComponent } from './components/chatlive/chatlive.component';
-import { ChatliveService } from './components/chatlive/chatlive.service';
+import { ChatliveModule } from './components/chatlive/chatlive.module';
+
 
 @NgModule({
   declarations: [
     AppComponent,
-    ChatliveComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    FormsModule
+    FormsModule,
+    ChatliveModule
   ],
   providers: [],
   bootstrap: [AppComponent]
