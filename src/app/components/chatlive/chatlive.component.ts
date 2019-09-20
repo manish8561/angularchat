@@ -223,9 +223,12 @@ export class ChatliveComponent implements OnInit {
     this.userMinimize = !this.userMinimize;
   }
   minimizeAdmin(user) {
-    this.liveUsers.map((ele, index) => {
+    this.liveUsers.map((ele) => {
       if (ele.room == user.room) {
         ele.minimize = !ele.minimize;
+        if(!ele.minimize && this.joinedUser != user.room){
+          this.joinUser(user);
+        }
       }
     });
   }

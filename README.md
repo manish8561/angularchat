@@ -1,7 +1,7 @@
 # angularchat
 angular chat with socket io
 
-Requirements:
+# Requirements:
 1. Socket.io Socket-client.io for chat application in both ends.
 2. angualr cli ^8.x
 3. node ^ 10.
