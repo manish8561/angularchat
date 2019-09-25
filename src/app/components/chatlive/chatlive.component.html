@@ -47,12 +47,12 @@
 
                     <div *ngFor="let item of user.message">
                         <!-- Message to the right -->
-                        <div [ngClass]="{'direct-chat-msg': true, 'right':loggedUser.username === item.username}">
+                        <div [ngClass]="{'direct-chat-msg': true, 'right':username === item.username}">
                             <div class="direct-chat-info clearfix">
                                 <span
-                                    [ngClass]="{'direct-chat-name': true,'pull-right':loggedUser.username === item.username, 'pull-left':loggedUser.username !== item.username}">{{item.username}}</span>
+                                    [ngClass]="{'direct-chat-name': true,'pull-right':username === item.username, 'pull-left':username !== item.username}">{{item.username}}</span>
                                 <span
-                                    [ngClass]="{'direct-chat-timestamp': true,'pull-right':loggedUser.username !== user.username, 'pull-left':loggedUser.username === item.username}">{{user.created_at|date:'medium'}}</span>
+                                    [ngClass]="{'direct-chat-timestamp': true,'pull-right':username !== user.username, 'pull-left':username === item.username}">{{user.created_at|date:'medium'}}</span>
                             </div>
                             <!-- /.direct-chat-info -->
                             <img class="direct-chat-img" src="../../../assets/user_1.jpg" alt="Message User Image">
@@ -112,12 +112,12 @@
 
                     <div *ngFor="let item of messageArray">
                         <!-- Message to the right -->
-                        <div [ngClass]="{'direct-chat-msg': true, 'right':loggedUser.username === item.username}">
+                        <div [ngClass]="{'direct-chat-msg': true, 'right':username === item.username}">
                             <div class="direct-chat-info clearfix">
                                 <span
-                                    [ngClass]="{'direct-chat-name': true,'pull-right':loggedUser.username === item.username, 'pull-left':loggedUser.username !== item.username}">{{item.username}}</span>
+                                    [ngClass]="{'direct-chat-name': true,'pull-right':username === item.username, 'pull-left':username !== item.username}">{{item.username}}</span>
                                 <span
-                                    [ngClass]="{'direct-chat-timestamp': true,'pull-right':loggedUser.username !== item.username, 'pull-left':loggedUser.username === item.username}">{{item.created_at|date:'medium'}}</span>
+                                    [ngClass]="{'direct-chat-timestamp': true,'pull-right':username !== item.username, 'pull-left':username === item.username}">{{item.created_at|date:'medium'}}</span>
                             </div>
                             <!-- /.direct-chat-info -->
                             <img class="direct-chat-img" src="../../../assets/user_1.jpg" alt="Message User Image">

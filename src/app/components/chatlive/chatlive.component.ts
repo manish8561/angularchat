@@ -6,16 +6,18 @@ import { element } from 'protractor';
   selector: 'app-chatlive',
   templateUrl: './chatlive.component.html',
   styleUrls: ['./chatlive.component.scss'],
-  providers: [ChatliveService]
+  // providers: [ChatliveService]
 })
 export class ChatliveComponent implements OnInit {
   display = false;
   admindisplay = false;
+  admin_room = 1;
   room = 'default';
   message: String;
   sendMsg: any;
   messageArray: Array<{ user: String, message: String }> = [];
-  loggedUser: any;
+  username: any;
+  user_room: any;
   liveUsers = [];
   joinedUser = 0;
   usercount = 0;
@@ -23,11 +25,13 @@ export class ChatliveComponent implements OnInit {
   userMinimize = true;
   @ViewChild('messagebody', { static: false }) myDiv: ElementRef;
   constructor(private _chatservice: ChatliveService) {
-    this.loggedUser = JSON.parse(localStorage.getItem('user'));
+    this.admin_room = _chatservice.options.admin_room;
+    this.username = localStorage.getItem('username');
+    this.user_room = localStorage.getItem('user_room');
   }
 
   ngOnInit() {
-    if (this.loggedUser !== null && this.loggedUser.user_id == 1) {
+    if (this.username !== null && this.user_room == this.admin_room) {
       this.admindisplay = true;
     }
   }
@@ -71,7 +75,7 @@ export class ChatliveComponent implements OnInit {
     }
 
     );
-    if (this.loggedUser.user_id == 1) {
+    if (this.user_room == this.admin_room) {
       this._chatservice.newUser()
         .subscribe(data => {
           let d: any = data;
@@ -87,7 +91,7 @@ export class ChatliveComponent implements OnInit {
   }
   addMessage(data) {
     this.messageArray.push(data);
-    if (this.loggedUser.username != data.username) {
+    if (this.username != data.username) {
       this.usercount += 1;
     }
     this.liveUsers.map((user, index) => {
@@ -100,7 +104,7 @@ export class ChatliveComponent implements OnInit {
     });
   }
   addTyping(data) {
-    if (this.loggedUser.username != data.username) {
+    if (this.username != data.username) {
       this.usertyping = true;
       setTimeout(() => {
         this.usertyping = false;
@@ -120,8 +124,7 @@ export class ChatliveComponent implements OnInit {
   /* join() {
     this._chatservice.joinRoom();
   } */
-  joinUser(user: any) {
-    this.joinedUser = user.room;
+  joinUser(user: any) {   
     this.liveUsers.map((ele, index) => {
       if (ele.room == user.room) {
         if (ele.username == user.username) {
@@ -129,7 +132,11 @@ export class ChatliveComponent implements OnInit {
         }
       }
     });
-    this._chatservice.joinUserRoom(user.room, this.liveUsers);
+    if(this.joinUser != user.room){
+      this.joinedUser = user.room;
+      this._chatservice.joinUserRoom(user.room, this.liveUsers);
+    }
+    
   }
   typingMsg($event, user: any = {}) {
     if (this.admindisplay) {
@@ -139,8 +146,8 @@ export class ChatliveComponent implements OnInit {
       }
     } else {
       const data = {
-        username: this.loggedUser.username,
-        room: this.loggedUser.user_id,
+        username: this.username,
+        room: this.user_room,
         created_at: new Date()
       };
       this._chatservice.typingMsg(data.room);
@@ -149,15 +156,15 @@ export class ChatliveComponent implements OnInit {
   leave() {
     this.display = false;
     const data = {
-      username: this.loggedUser.username,
-      room: this.loggedUser.user_id,
+      username: this.username,
+      room: this.user_room,
       created_at: new Date()
     };
     this._chatservice.leaveRoom(data);
   }
   leaveUser() {
     const data = {
-      username: this.loggedUser.username,
+      username: this.username,
       room: this.joinedUser,
       created_at: new Date()
     };
@@ -174,8 +181,8 @@ export class ChatliveComponent implements OnInit {
   sendMessage() {
     this.usercount = 0;
     const data = {
-      username: this.loggedUser.username,
-      room: this.loggedUser.user_id,
+      username: this.username,
+      room: this.user_room,
       created_at: new Date(),
       message: this.message
     };
@@ -195,7 +202,7 @@ export class ChatliveComponent implements OnInit {
     });
 
     const data = {
-      username: this.loggedUser.username,
+      username: this.username,
       room: this.joinedUser,
       created_at: new Date(),
       message: msg
@@ -211,7 +218,7 @@ export class ChatliveComponent implements OnInit {
     const keysValue = [13];
     // console.log($event.which, keysValue.indexOf($event.which));
     if (keysValue.indexOf($event.which) > -1) {
-      if (this.loggedUser.user_id == 1) {
+      if (this.user_room == this.admin_room) {
         this.adminSendMessage();
       } else {
         this.sendMessage();

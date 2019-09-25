@@ -1,29 +1,42 @@
-import { Injectable } from '@angular/core';
+import { Injectable, InjectionToken, Inject } from '@angular/core';
 import * as io from 'socket.io-client';
 import { Observable } from 'rxjs';
 
+export const ChatliveServiceConfig = new InjectionToken<any>('token for chat code');
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ChatliveService {
   private socket: any;
-  private loggedUser: any;
-  constructor() {
-    this.loggedUser = JSON.parse(localStorage.getItem('user'));
+  private username: string;
+  private user_room: any;
+  public options : any = {
+    url: 'http://localhost:3000',
+    admin_room: 1,
+    room: 'default',
+    username: 'admin',
+  };
+  constructor(@Inject(ChatliveServiceConfig) private config) {
+    this.options = config;
+    console.log(config, 'service');
+    this.username = localStorage.getItem('username');
+    this.user_room = localStorage.getItem('user_room');
   }
 
   openConnection() {
-    this.socket = io('http://10.0.1.14:3000');
+    //console.log(ChatConfig,'service');
+    this.socket = io(this.options.url);
     let data = {
-      username: this.loggedUser.username,
-      room: this.loggedUser.user_id,
+      username: this.username,
+      room: this.user_room,
       created_at: new Date(),
     };
-    if (this.loggedUser.user_id != 1) {
+    if (this.user_room != 1) {
       /* other users only */
       this.joinRoom(data);
     } else {
-      data.room = 'default';
+      data.room = this.options.room;
       this.socket.emit('join', data);
     }
 
@@ -40,12 +53,12 @@ export class ChatliveService {
 
   }
   joinUserRoom(room, users) {
-    const data = { username: this.loggedUser.username, room: room, created_at: new Date(), users: users};
+    const data = { username: this.username, room: room, created_at: new Date(), users: users };
     this.socket.emit('join', data);
     this.socket.emit('wait', data);
   }
   typingMsg(room) {
-    const data = { username: this.loggedUser.username, room: room, created_at: new Date()};
+    const data = { username: this.username, room: room, created_at: new Date() };
     this.socket.emit('typing', data);
   }
 
@@ -71,7 +84,7 @@ export class ChatliveService {
   }
 
   leaveRoom(data) {
-    if (this.loggedUser.user_id != 1) {
+    if (this.user_room != 1) {
       localStorage.setItem('joined', 'no');
     }
     this.socket.emit('leave', data);
