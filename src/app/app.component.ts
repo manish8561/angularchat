@@ -8,16 +8,16 @@ import { Component, OnInit } from '@angular/core';
 export class AppComponent implements OnInit {
   title = 'chatlive';
   check = true;
-  username:any;
+  username: any;
   ngOnInit() {
     this.username = localStorage.getItem('username');
-    if(this.username !== null){
-      this.check= false;
+    if (this.username !== null) {
+      this.check = false;
     }
   }
-  login(formdata: any){
+  login(formdata: any) {
     console.log(formdata);
-    if(formdata.username && formdata.user_id){
+    if (formdata.username && formdata.user_id) {
       localStorage.setItem('username', formdata.username);
       localStorage.setItem('user_room', formdata.user_id);
       this.check = false;

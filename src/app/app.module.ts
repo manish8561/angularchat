@@ -16,12 +16,11 @@ import { ChatliveModule } from './components/chatlive/chatlive.module';
     BrowserAnimationsModule,
     FormsModule,
     ChatliveModule.forRoot({
-      url: 'http://10.0.1.14:3000',
+      url: 'https://client.routemycalls.com:8445', // 'http://10.0.1.14:3000',
       admin_room: 1,
       room: 'default',
       username: 'admin'
     }),
-
   ],
   providers: [],
   bootstrap: [AppComponent]
