@@ -1,21 +1,26 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { ChatliveService } from './chatlive.service';
-import { element } from 'protractor';
+import { Component, OnInit, ElementRef, ViewChild } from "@angular/core";
+import { ChatliveService } from "./chatlive.service";
+import { element } from "protractor";
 
 @Component({
-  selector: 'app-chatlive',
-  templateUrl: './chatlive.component.html',
-  styleUrls: ['./chatlive.component.scss'],
+  selector: "app-chatlive",
+  templateUrl: "./chatlive.component.html",
+  styleUrls: ["./chatlive.component.scss"],
   // providers: [ChatliveService]
 })
 export class ChatliveComponent implements OnInit {
   display = false;
   admindisplay = false;
   adminRoom = 1;
-  room = 'default';
+  room = "default";
   message: string;
   sendMsg: any;
-  messageArray: Array<{ user: string, message: string, created_at: Date, status: string }> = [];
+  messageArray: Array<{
+    user: string;
+    message: string;
+    created_at: Date;
+    status: string;
+  }> = [];
   username: any;
   userRoom: any;
   liveUsers = [];
@@ -24,11 +29,11 @@ export class ChatliveComponent implements OnInit {
   usertyping = false;
   userMinimize = true;
 
-  @ViewChild('messagebody', { static: false }) myDiv: ElementRef;
+  @ViewChild("messagebody", { static: false }) myDiv: ElementRef;
   constructor(private chatService: ChatliveService) {
     this.adminRoom = chatService.options.adminRoom;
-    this.username = localStorage.getItem('username');
-    this.userRoom = localStorage.getItem('userRoom');
+    this.username = localStorage.getItem("username");
+    this.userRoom = localStorage.getItem("userRoom");
   }
 
   ngOnInit() {
@@ -40,66 +45,63 @@ export class ChatliveComponent implements OnInit {
     this.chatService.openConnection();
     this.display = true;
     this.userMinimize = false;
-    this.chatService.newUserJoined()
-      .subscribe(data =>
-        this.addMessage(data)
-        // this.messageArray.push(data)
-      );
-    this.chatService.newTyping()
-      .subscribe(data =>
-        this.addTyping(data)
-        // this.messageArray.push(data)
-      );
-    this.chatService.userLeftRoom()
-      .subscribe(data => {
-        // console.log(data,'manish');
-        this.addMessage(data);
-        this.liveUsers.map((user, index) => {
-          if (user.room === data.room) {
-            this.liveUsers.splice(index, 1);
-          }
-        });
+    this.chatService.newUserJoined().subscribe(
+      (data) => this.addMessage(data)
+      // this.messageArray.push(data)
+    );
+    this.chatService.newTyping().subscribe(
+      (data) => this.addTyping(data)
+      // this.messageArray.push(data)
+    );
+    this.chatService.userLeftRoom().subscribe((data) => {
+      // console.log(data,'manish');
+      this.addMessage(data);
+      this.liveUsers.map((user, index) => {
+        if (user.room === data.room) {
+          this.liveUsers.splice(index, 1);
+        }
       });
-    this.chatService.newMessageRecevied().subscribe(data => {
+    });
+    this.chatService.newMessageRecevied().subscribe((data) => {
       this.addMessage(data);
       // this.messageArray.push(data);
       setTimeout(() => {
         if (this.admindisplay) {
-          document.querySelectorAll('.messagebody').forEach(ele => {
+          document.querySelectorAll(".messagebody").forEach((ele) => {
             ele.scrollTop = ele.scrollHeight;
           });
         } else {
-          this.myDiv.nativeElement.scrollTop = this.myDiv.nativeElement.scrollHeight + 10;
+          this.myDiv.nativeElement.scrollTop =
+            this.myDiv.nativeElement.scrollHeight + 10;
         }
-
       }, 200);
-    }
-
-    );
+    });
     if (this.userRoom === this.adminRoom) {
-      this.chatService.newUser()
-        .subscribe(data => {
-          const d: any = data;
-          d.message = [];
-          d.count = 1;
-          d.msg = '';
-          d.typing = false;
-          d.minimize = false;
+      this.chatService.newUser().subscribe((data) => {
+        const d: any = data;
+        d.message = [];
+        d.count = 1;
+        d.msg = "";
+        d.typing = false;
+        d.minimize = false;
 
-          // console.log(data, 'invitation');
-          this.liveUsers = [...this.liveUsers, data];
-        });
+        // console.log(data, 'invitation');
+        this.liveUsers = [...this.liveUsers, data];
+      });
     }
   }
   addMessage(data) {
-    data.status = 'unseen';
+    data.status = "unseen";
     this.messageArray.push(data);
     if (this.username !== data.username) {
       this.usercount += 1;
     }
     this.liveUsers.map((user, index) => {
       if (user.room === data.room) {
-        this.liveUsers[index].message = [...this.liveUsers[index].message, data];
+        this.liveUsers[index].message = [
+          ...this.liveUsers[index].message,
+          data,
+        ];
         if (user.username === data.username) {
           this.liveUsers[index].count += 1;
         }
@@ -139,7 +141,6 @@ export class ChatliveComponent implements OnInit {
       this.joinedUser = user.room;
       this.chatService.joinUserRoom(user.room, this.liveUsers);
     }
-
   }
   typingMsg($event, user: any = {}) {
     if (this.admindisplay) {
@@ -151,7 +152,7 @@ export class ChatliveComponent implements OnInit {
       const data = {
         username: this.username,
         room: this.userRoom,
-        created_at: new Date()
+        created_at: new Date(),
       };
       this.chatService.typingMsg(data.room);
     }
@@ -161,7 +162,7 @@ export class ChatliveComponent implements OnInit {
     const data = {
       username: this.username,
       room: this.userRoom,
-      created_at: new Date()
+      created_at: new Date(),
     };
     this.chatService.leaveRoom(data);
   }
@@ -169,7 +170,7 @@ export class ChatliveComponent implements OnInit {
     const data = {
       username: this.username,
       room: this.joinedUser,
-      created_at: new Date()
+      created_at: new Date(),
     };
     this.liveUsers.map((user, index) => {
       if (user.room === data.room) {
@@ -182,7 +183,7 @@ export class ChatliveComponent implements OnInit {
     this.usercount = 0;
     this.chatService.applySeen();
     this.messageArray.map((ele, index) => {
-      this.messageArray[index].status = 'seen';
+      this.messageArray[index].status = "seen";
     });
   }
   sendMessage() {
@@ -191,21 +192,19 @@ export class ChatliveComponent implements OnInit {
       username: this.username,
       room: this.userRoom,
       created_at: new Date(),
-      message: this.message
+      message: this.message,
     };
-    if (this.message !== '') {
+    if (this.message !== "") {
       this.chatService.sendMessage(data);
-      this.message = '';
+      this.message = "";
     }
-
   }
   adminSendMessage() {
-
-    let msg = '';
+    let msg = "";
     this.liveUsers.map((ele, index) => {
       if (ele.room === this.joinedUser) {
         msg = ele.msg;
-        ele.msg = '';
+        ele.msg = "";
       }
     });
 
@@ -213,10 +212,10 @@ export class ChatliveComponent implements OnInit {
       username: this.username,
       room: this.joinedUser,
       created_at: new Date(),
-      message: msg
+      message: msg,
     };
 
-    if (msg !== '') {
+    if (msg !== "") {
       this.chatService.sendMessage(data);
     }
   }
@@ -233,7 +232,6 @@ export class ChatliveComponent implements OnInit {
         this.sendMessage();
       }
     }
-
   }
   minimizeChat() {
     this.userMinimize = !this.userMinimize;

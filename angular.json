@@ -128,5 +128,8 @@
       }
     }
   },
-  "defaultProject": "chatlive"
+  "defaultProject": "chatlive",
+  "cli": {
+    "analytics": "8682c311-f069-4298-83f7-788cc2697f89"
+  }
 }
