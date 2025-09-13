@@ -3,17 +3,17 @@
 /**
  * Module dependencies.
  */
-const express = require('express');
+const express = require("express");
 const app = express();
-var debug = require('debug')('angular2-nodejs:server');
-var http = require('http');
+var debug = require("debug")("angular2-nodejs:server");
+var http = require("http");
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+var port = normalizePort(process.env.PORT || "3000");
+app.set("port", port);
 
 /**
  * Create HTTP server.
@@ -21,69 +21,89 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
-var io = require('socket.io').listen(server);
+const { Server } = require("socket.io");
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
-io.on('connection',(socket)=>{
-    console.log('new connection made.');
+io.on("connection", (socket) => {
+  console.log("new connection made.");
 
-    socket.on('invite', function(data){
-      // new user invitation
-      console.log(data , 'invitation from user: ');
-      socket.to('default').emit('new_user', data);
+  socket.on("invite", function (data) {
+    // new user invitation
+    console.log(data, "invitation from user: ");
+    socket.to("default").emit("new_user", data);
+  });
+
+  socket.on("join", function (data) {
+    //joining
+    socket.join(data.room);
+
+    console.log(data.username + "joined the chat : " + data.room);
+
+    socket.broadcast.to(data.room).emit("new user joined", {
+      username: data.username,
+      room: data.room,
+      message: "has joined the chat.",
+    });
+  });
+  socket.on("typing", function (data) {
+    // console.log(data.username + 'typing in the chat : ' + data.room);
+
+    socket.broadcast
+      .to(data.room)
+      .emit("new typing", { username: data.username, room: data.room });
+  });
+  socket.on("wait", function (data) {
+    console.log("wait message to all");
+    data.users.forEach((element) => {
+      if (element.room !== data.room) {
+        socket.to(element.room).emit("new message", {
+          username: "admin",
+          message: "Kindly wait for your turn you are in queue.",
+        });
+      }
+    });
+  });
+
+  socket.on("leave", function (data) {
+    console.log(data.username + "left the chat : " + data.room);
+
+    socket.broadcast.to(data.room).emit("left room", {
+      username: data.username,
+      message: "has left the chat.",
+      created_at: data.created_at,
+      room: data.room,
     });
 
-    socket.on('join', function(data){
-      //joining
-      socket.join(data.room);
+    socket.leave(data.room);
+  });
 
-      console.log(data.username + 'joined the chat : ' + data.room);
-
-      socket.broadcast.to(data.room).emit('new user joined', {username:data.username, room: data.room, message:'has joined the chat.'});
+  socket.on("message", function (data) {
+    io.in(data.room).emit("new message", {
+      username: data.username,
+      message: data.message,
+      created_at: data.created_at,
+      room: data.room,
     });
-    socket.on('typing', function(data){
-      
-      // console.log(data.username + 'typing in the chat : ' + data.room);
-
-      socket.broadcast.to(data.room).emit('new typing', {username:data.username, room:data.room});
-    });
-    socket.on('wait', function(data){
-      console.log('wait message to all');
-      data.users.forEach(element => {
-        if(element.room !== data.room){
-          socket.to(element.room).emit('new message', {username:'admin', message:'Kindly wait for your turn you are in queue.'});
-        }  
-      });
-      
-    });
-
-
-    socket.on('leave', function(data){
-    
-      console.log(data.username + 'left the chat : ' + data.room);
-
-      socket.broadcast.to(data.room).emit('left room', {username:data.username, message:'has left the chat.',created_at: data.created_at, room: data.room});
-
-      socket.leave(data.room);
-    });
-
-    socket.on('message',function(data){
-
-      io.in(data.room).emit('new message', {username:data.username, message:data.message, created_at: data.created_at, room: data.room});
-    })
+  });
 });
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-app.get('/', function(req, res){
-  console.log('url is working');
+app.get("/", function (req, res) {
+  console.log("url is working");
   res.send("Hello world!");
 });
- 
+
 server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+server.on("error", onError);
+server.on("listening", onListening);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -110,22 +130,20 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
+  if (error.syscall !== "listen") {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
       process.exit(1);
       break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
       process.exit(1);
       break;
     default:
@@ -139,8 +157,7 @@ function onError(error) {
 
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  console.log("Listening on " + bind);
+  debug("Listening on " + bind);
 }
