@@ -5,21 +5,21 @@
  */
 const express = require("express");
 const app = express();
-var debug = require("debug")("angular2-nodejs:server");
-var http = require("http");
+const debug = require("debug")("angular2-nodejs:server");
+const http = require("node:http");
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || "3000");
+const port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+const server = http.createServer(app);
 
 const { Server } = require("socket.io");
 const io = new Server(server, {
@@ -51,22 +51,20 @@ io.on("connection", (socket) => {
     });
   });
   socket.on("typing", function (data) {
-    // console.log(data.username + 'typing in the chat : ' + data.room);
-
     socket.broadcast
       .to(data.room)
       .emit("new typing", { username: data.username, room: data.room });
   });
   socket.on("wait", function (data) {
     console.log("wait message to all");
-    data.users.forEach((element) => {
+    for (let element of data.users) {
       if (element.room !== data.room) {
         socket.to(element.room).emit("new message", {
           username: "admin",
           message: "Kindly wait for your turn you are in queue.",
         });
       }
-    });
+    }
   });
 
   socket.on("leave", function (data) {
@@ -110,9 +108,9 @@ server.on("listening", onListening);
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+  const port = Number.parseInt(val, 10);
 
-  if (isNaN(port)) {
+  if (Number.isNaN(port)) {
     // named pipe
     return val;
   }
@@ -134,7 +132,7 @@ function onError(error) {
     throw error;
   }
 
-  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+  const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -156,8 +154,8 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  const addr = server.address();
+  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   console.log("Listening on " + bind);
   debug("Listening on " + bind);
 }
