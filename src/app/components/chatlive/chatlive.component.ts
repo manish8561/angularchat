@@ -1,6 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild } from "@angular/core";
 import { ChatliveService } from "./chatlive.service";
-import { element } from "protractor";
 
 @Component({
   selector: "app-chatlive",
@@ -13,7 +12,7 @@ export class ChatliveComponent implements OnInit {
   admindisplay = false;
   adminRoom = 1;
   room = "default";
-  message: string;
+  message = "";
   sendMsg: any;
   messageArray: Array<{
     user: string;
@@ -23,7 +22,7 @@ export class ChatliveComponent implements OnInit {
   }> = [];
   username: any;
   userRoom: any;
-  liveUsers = [];
+  liveUsers: any = [];
   joinedUser = 0;
   usercount = 0;
   usertyping = false;
@@ -46,17 +45,16 @@ export class ChatliveComponent implements OnInit {
     this.display = true;
     this.userMinimize = false;
     this.chatService.newUserJoined().subscribe(
-      (data) => this.addMessage(data)
+      (data) => this.addMessage(data),
       // this.messageArray.push(data)
     );
     this.chatService.newTyping().subscribe(
-      (data) => this.addTyping(data)
+      (data) => this.addTyping(data),
       // this.messageArray.push(data)
     );
     this.chatService.userLeftRoom().subscribe((data) => {
-      // console.log(data,'manish');
       this.addMessage(data);
-      this.liveUsers.map((user, index) => {
+      this.liveUsers.forEach((user: any, index: number) => {
         if (user.room === data.room) {
           this.liveUsers.splice(index, 1);
         }
@@ -64,7 +62,6 @@ export class ChatliveComponent implements OnInit {
     });
     this.chatService.newMessageRecevied().subscribe((data) => {
       this.addMessage(data);
-      // this.messageArray.push(data);
       setTimeout(() => {
         if (this.admindisplay) {
           document.querySelectorAll(".messagebody").forEach((ele) => {
@@ -85,18 +82,17 @@ export class ChatliveComponent implements OnInit {
         d.typing = false;
         d.minimize = false;
 
-        // console.log(data, 'invitation');
         this.liveUsers = [...this.liveUsers, data];
       });
     }
   }
-  addMessage(data) {
+  addMessage(data: any) {
     data.status = "unseen";
     this.messageArray.push(data);
     if (this.username !== data.username) {
       this.usercount += 1;
     }
-    this.liveUsers.map((user, index) => {
+    this.liveUsers.forEach((user: any, index: number) => {
       if (user.room === data.room) {
         this.liveUsers[index].message = [
           ...this.liveUsers[index].message,
@@ -108,14 +104,14 @@ export class ChatliveComponent implements OnInit {
       }
     });
   }
-  addTyping(data) {
+  addTyping(data: any = {}) {
     if (this.username !== data.username) {
       this.usertyping = true;
       setTimeout(() => {
         this.usertyping = false;
       }, 4000);
     }
-    this.liveUsers.map((user, index) => {
+    this.liveUsers.forEach((user: any, index: number) => {
       if (user.room === data.room) {
         if (user.username === data.username) {
           this.liveUsers[index].typing = true;
@@ -130,7 +126,7 @@ export class ChatliveComponent implements OnInit {
     this.chatService.joinRoom();
   } */
   joinUser(user: any) {
-    this.liveUsers.map((ele, index) => {
+    this.liveUsers.forEach((ele: any, index: number) => {
       if (ele.room === user.room) {
         if (ele.username === user.username) {
           this.liveUsers[index].count = 0;
@@ -142,7 +138,7 @@ export class ChatliveComponent implements OnInit {
       this.chatService.joinUserRoom(user.room, this.liveUsers);
     }
   }
-  typingMsg($event, user: any = {}) {
+  typingMsg($event: any, user: any = {}) {
     if (this.admindisplay) {
       const msg = $event.target.value;
       if (msg.length > 0) {
@@ -172,7 +168,7 @@ export class ChatliveComponent implements OnInit {
       room: this.joinedUser,
       created_at: new Date(),
     };
-    this.liveUsers.map((user, index) => {
+    this.liveUsers.forEach((user: any, index: number) => {
       if (user.room === data.room) {
         this.liveUsers.splice(index, 1);
       }
@@ -182,7 +178,7 @@ export class ChatliveComponent implements OnInit {
   userFocus() {
     this.usercount = 0;
     this.chatService.applySeen();
-    this.messageArray.map((ele, index) => {
+    this.messageArray.forEach((ele: any, index) => {
       this.messageArray[index].status = "seen";
     });
   }
@@ -201,7 +197,7 @@ export class ChatliveComponent implements OnInit {
   }
   adminSendMessage() {
     let msg = "";
-    this.liveUsers.map((ele, index) => {
+    this.liveUsers.forEach((ele: any) => {
       if (ele.room === this.joinedUser) {
         msg = ele.msg;
         ele.msg = "";
@@ -220,11 +216,10 @@ export class ChatliveComponent implements OnInit {
     }
   }
 
-  keySend($event, user = {}) {
+  keySend($event: any, user: any = {}) {
     // if the letter is not digit then display error and don't type anything
     this.typingMsg($event, user);
     const keysValue = [13];
-    // console.log($event.which, keysValue.indexOf($event.which));
     if (keysValue.indexOf($event.which) > -1) {
       if (this.userRoom === this.adminRoom) {
         this.adminSendMessage();
@@ -236,8 +231,8 @@ export class ChatliveComponent implements OnInit {
   minimizeChat() {
     this.userMinimize = !this.userMinimize;
   }
-  minimizeAdmin(user) {
-    this.liveUsers.map((ele) => {
+  minimizeAdmin(user: any) {
+    this.liveUsers.forEach((ele: any) => {
       if (ele.room === user.room) {
         ele.minimize = !ele.minimize;
         if (!ele.minimize && this.joinedUser !== user.room) {
