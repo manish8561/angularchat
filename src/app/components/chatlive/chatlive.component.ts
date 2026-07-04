@@ -29,7 +29,8 @@ export class ChatliveComponent implements OnInit {
   userMinimize = true;
 
   @ViewChild("messagebody", { static: false }) myDiv: ElementRef;
-  constructor(private chatService: ChatliveService) {
+  constructor(private readonly chatService: ChatliveService) {
+    this.myDiv = new ElementRef(null);
     this.adminRoom = chatService.options.adminRoom;
     this.username = localStorage.getItem("username");
     this.userRoom = localStorage.getItem("userRoom");
