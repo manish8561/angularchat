@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --poll 1000",
     "build": "ng build",
     "prepush": "npm run build -- --configuration production",
     "prepare": "git config core.hooksPath .githooks || true",
