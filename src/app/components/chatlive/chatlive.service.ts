@@ -1,5 +1,5 @@
 import { Injectable, InjectionToken, Inject } from "@angular/core";
-import * as io from "socket.io-client";
+import { io } from "socket.io-client";
 import { Observable } from "rxjs";
 
 export const ChatliveServiceConfig = new InjectionToken<any>(

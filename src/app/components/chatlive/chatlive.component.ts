@@ -3,6 +3,7 @@ import { ChatliveService } from "./chatlive.service";
 
 @Component({
   selector: "app-chatlive",
+  standalone: false,
   templateUrl: "./chatlive.component.html",
   styleUrls: ["./chatlive.component.scss"],
   // providers: [ChatliveService]

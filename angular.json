@@ -68,20 +68,14 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "browserTarget": "chatlive:build"
-          },
+          "options": {},
           "configurations": {
-            "production": {
-              "browserTarget": "chatlive:build:production"
-            }
+            "production": {}
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "browserTarget": "chatlive:build"
-          }
+          "options": {}
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
