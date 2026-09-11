@@ -2,5 +2,9 @@
 
 set -e
 
+date
+
+echo "##################################################################"
+
 echo "Running pre-push checks..."
 npm run prepush
