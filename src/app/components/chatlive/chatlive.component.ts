@@ -23,7 +23,7 @@ export class ChatliveComponent implements OnInit {
   }> = [];
   username: any;
   userRoom: any;
-  liveUsers: any = [];
+  liveUsers: any[] = [];
   joinedUser = 0;
   usercount = 0;
   usertyping = false;

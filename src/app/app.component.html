@@ -296,6 +296,74 @@
   }
 </style>
 <app-chatlive></app-chatlive>
+<main class="home-page">
+  <nav class="home-nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="Chatlive home">
+      <span class="brand-mark">+</span>
+      <span>chatlive</span>
+    </a>
+    <span class="nav-status"><i></i> Support is online</span>
+  </nav>
+
+  <section class="home-hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Real people. Right when you need them.</p>
+      <h1>A better way to <em>talk</em> things through.</h1>
+      <p class="hero-description">
+        Connect with our support team in a calm, private space. No ticket
+        queues, no guessing where your question went.
+      </p>
+      <div class="hero-proof">
+        <span class="avatar-stack" aria-hidden="true"><b>S</b><b>M</b><b>J</b></span>
+        <span>Join customers getting helpful answers every day</span>
+      </div>
+    </div>
+
+    <aside class="welcome-card" *ngIf="check">
+      <div class="card-kicker">Start here</div>
+      <h2>Open your conversation</h2>
+      <p>Choose a name and room ID so our team knows where to meet you.</p>
+      <form #homeLoginForm="ngForm" (ngSubmit)="login(homeLoginForm.value)">
+        <label>
+          <span>Your name</span>
+          <input type="text" name="username" ngModel required placeholder="e.g. Alex" />
+        </label>
+        <label>
+          <span>Room ID</span>
+          <input type="text" name="user_id" ngModel required placeholder="e.g. 42" />
+        </label>
+        <button type="submit">Enter chat <span aria-hidden="true">-&gt;</span></button>
+      </form>
+      <small>Your conversation stays private to this room.</small>
+    </aside>
+
+    <aside class="welcome-card ready-card" *ngIf="!check">
+      <span class="ready-icon">&#10003;</span>
+      <div class="card-kicker">You are signed in</div>
+      <h2>Ready when you are, {{ username }}.</h2>
+      <p>Use the chat button in the corner to start a conversation with our support team.</p>
+      <span class="ready-note"><i></i> Average reply time: a few minutes</span>
+    </aside>
+  </section>
+
+  <section class="home-features" aria-label="Chat benefits">
+    <article>
+      <span class="feature-number">01</span>
+      <h2>Human support</h2>
+      <p>Talk to a real person who can help you move forward.</p>
+    </article>
+    <article>
+      <span class="feature-number">02</span>
+      <h2>Simple by design</h2>
+      <p>One clear room, one focused conversation, zero clutter.</p>
+    </article>
+    <article>
+      <span class="feature-number">03</span>
+      <h2>Always in reach</h2>
+      <p>Pick up the conversation whenever you are ready.</p>
+    </article>
+  </section>
+</main>
 <!-- Toolbar -->
 <div class="toolbar" role="banner">
   <img

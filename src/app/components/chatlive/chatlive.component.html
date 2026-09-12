@@ -1,274 +1,126 @@
-<div
-  class="row bootstrap snippets chatlive"
-  [ngClass]="{
-    'row bootstrap snippets': true,
-    chatlive: !admindisplay,
-    chatliveadmin: admindisplay
-  }"
->
-  <button
-    type="button"
-    class="btn btn-info chat-button"
-    (click)="open()"
-    *ngIf="!display"
-  >
-    Support Chat
+<div class="chatlive" [ngClass]="{ chatliveadmin: admindisplay }">
+  <button type="button" class="chat-launcher" (click)="open()" *ngIf="!display">
+    <span class="launcher-mark">+</span>
+    <span>Start a conversation</span>
   </button>
-  <div class="col-md-9"></div>
 
-  <div class="col-md-3 pull-right" *ngFor="let user of liveUsers">
-    <!-- DIRECT CHAT PRIMARY -->
-    <div
-      class="box box-primary direct-chat direct-chat-primary"
-      *ngIf="admindisplay"
-    >
-      <div class="box-header with-border">
-        <h3 class="box-title">Live Chat</h3>
-        &nbsp;<small>{{ user.username }}</small>
-        <div class="box-tools pull-right">
-          <span
-            data-toggle="tooltip"
-            title="{{ user.count }} New Messages"
-            class="badge bg-light-blue"
-            [ngStyle]="{ color: user.count > 0 ? 'red' : 'black' }"
-            >{{ user.count }}</span
+  <div class="admin-chats" *ngIf="admindisplay">
+    <section class="chat-card" *ngFor="let user of liveUsers">
+      <header class="chat-header">
+        <div class="profile-badge">
+          {{ $any(user.username)?.charAt(0)?.toUpperCase() }}
+        </div>
+        <div class="chat-title">
+          <h2>{{ user.username }}</h2>
+          <span><i class="status-dot"></i>Active conversation</span>
+        </div>
+        <span class="unread" *ngIf="user.count > 0">{{ user.count }}</span>
+        <button
+          type="button"
+          class="header-action"
+          (click)="minimizeAdmin(user)"
+        >
+          {{ user.minimize ? "+" : "-" }}
+        </button>
+        <button
+          type="button"
+          class="header-action close-action"
+          (click)="leaveUser()"
+        >
+          x
+        </button>
+      </header>
+      <div class="chat-body" [hidden]="user.minimize">
+        <div class="message-list messagebody">
+          <div class="welcome-note">
+            Conversation started {{ user.create_at | date: "mediumDate" }}
+          </div>
+          <div
+            *ngFor="let item of user.message"
+            class="message-row"
+            [ngClass]="{ mine: username === item.username }"
           >
-          <button
-            type="button"
-            class="btn btn-box-tool"
-            data-widget="collapse"
-            (click)="minimizeAdmin(user)"
-          >
-            <i class="fa fa-minus"></i>_
-          </button>
-          <button
-            type="button"
-            class="btn btn-box-tool"
-            data-widget="remove"
-            (click)="leaveUser()"
-            *ngIf="admindisplay"
-          >
-            <i class="fa fa-times"></i>X
-          </button>
+            <div class="message-meta">
+              <strong>{{ item.username }}</strong
+              ><span>{{ item.created_at | date: "shortTime" }}</span>
+            </div>
+            <div class="message-bubble">{{ item.message }}</div>
+          </div>
+          <p class="typing" [hidden]="!user.typing">
+            {{ user.username }} is typing...
+          </p>
         </div>
       </div>
-      <!-- /.box-header -->
-      <div class="box-body" [hidden]="user.minimize">
-        <!-- Conversations are loaded here -->
-        <div class="direct-chat-messages messagebody">
-          <!-- Message. Default to the left -->
-          <div class="direct-chat-msg">
-            <div class="direct-chat-info clearfix">
-              <span class="direct-chat-name pull-left">{{
-                user.username
-              }}</span>
-              <span class="direct-chat-timestamp pull-right">{{
-                user.create_at | date : "medium"
-              }}</span>
-            </div>
-            <!-- /.direct-chat-info -->
-            <img
-              class="direct-chat-img"
-              src="../../../assets/user_1.jpg"
-              alt="Message User Image"
-            />
-            <!-- /.direct-chat-img -->
-            <div class="direct-chat-text">start the chat.</div>
-            <!-- /.direct-chat-text -->
-          </div>
-          <!-- /.direct-chat-msg -->
-
-          <!-- Message to the right -->
-
-          <!-- /.direct-chat-msg -->
-
-          <div *ngFor="let item of user.message">
-            <!-- Message to the right -->
-            <div
-              [ngClass]="{
-                'direct-chat-msg': true,
-                right: username === item.username
-              }"
-            >
-              <div class="direct-chat-info clearfix">
-                <span
-                  [ngClass]="{
-                    'direct-chat-name': true,
-                    'pull-right': username === item.username,
-                    'pull-left': username !== item.username
-                  }"
-                  >{{ item.username }}</span
-                >
-                <span
-                  [ngClass]="{
-                    'direct-chat-timestamp': true,
-                    'pull-right': username !== user.username,
-                    'pull-left': username === item.username
-                  }"
-                  >{{ user.created_at | date : "medium" }}</span
-                >
-              </div>
-              <!-- /.direct-chat-info -->
-              <img
-                class="direct-chat-img"
-                src="../../../assets/user_1.jpg"
-                alt="Message User Image"
-              />
-              <!-- /.direct-chat-img -->
-              <div class="direct-chat-text">
-                {{ item.message }}
-              </div>
-              <!-- /.direct-chat-text -->
-            </div>
-          </div>
-          <p class="typing" [hidden]="!user.typing">user is typing...</p>
-        </div>
-        <!--/.direct-chat-messages-->
-      </div>
-      <!-- /.box-body -->
-      <div class="box-footer" [hidden]="user.minimize">
-        <form action="#" method="post">
-          <div class="input-group">
-            <input
-              type="text"
-              name="message"
-              [(ngModel)]="user.msg"
-              placeholder="Type Message ..."
-              class="form-control"
-              (keyup)="keySend($event, user)"
-              (focus)="joinUser(user)"
-            />
-            <span class="input-group-btn">
-              <button
-                type="button"
-                class="btn btn-primary btn-flat"
-                (click)="adminSendMessage()"
-              >
-                Send
-              </button>
-            </span>
-          </div>
-        </form>
-      </div>
-      <!-- /.box-footer-->
-    </div>
-    <!--/.direct-chat -->
+      <footer class="composer" [hidden]="user.minimize">
+        <input
+          type="text"
+          name="message"
+          [(ngModel)]="user.msg"
+          placeholder="Write a message..."
+          (keyup)="keySend($event, user)"
+          (focus)="joinUser(user)"
+        />
+        <button type="button" class="send-button" (click)="adminSendMessage()">
+          Send
+        </button>
+      </footer>
+    </section>
   </div>
-  <div class="col-md-3" *ngIf="!admindisplay && display">
-    <!-- DIRECT CHAT PRIMARY -->
-    <div class="box box-primary direct-chat direct-chat-primary">
-      <div class="box-header with-border">
-        <h3 class="box-title">Live Chat</h3>
-        <div class="box-tools pull-right">
-          <span
-            data-toggle="tooltip"
-            title="{{ usercount }} New Messages"
-            class="badge bg-light-blue"
-            [ngStyle]="{ color: usercount > 0 ? 'red' : 'black' }"
-            >{{ usercount }}</span
-          >
-          <button
-            type="button"
-            class="btn btn-box-tool"
-            data-widget="collapse"
-            (click)="minimizeChat()"
-          >
-            <i class="fa fa-minus"></i>_
-          </button>
-          <button
-            type="button"
-            class="btn btn-box-tool"
-            data-widget="remove"
-            (click)="leave()"
-            *ngIf="!admindisplay"
-          >
-            <i class="fa fa-times"></i>X
-          </button>
+
+  <section class="chat-card visitor-chat" *ngIf="!admindisplay && display">
+    <header class="chat-header">
+      <div class="profile-badge agent-badge">S</div>
+      <div class="chat-title">
+        <h2>Support team</h2>
+        <span><i class="status-dot"></i>Usually replies in a few minutes</span>
+      </div>
+      <span class="unread" *ngIf="usercount > 0">{{ usercount }}</span>
+      <button type="button" class="header-action" (click)="minimizeChat()">
+        {{ userMinimize ? "+" : "-" }}
+      </button>
+      <button
+        type="button"
+        class="header-action close-action"
+        (click)="leave()"
+      >
+        x
+      </button>
+    </header>
+    <div class="chat-body" [hidden]="userMinimize">
+      <div #messagebody class="message-list">
+        <div class="welcome-panel">
+          <div class="welcome-icon">S</div>
+          <strong>How can we help?</strong>
+          <span>Send us a message and our team will be with you shortly.</span>
         </div>
-      </div>
-      <!-- /.box-header -->
-      <div class="box-body" [hidden]="userMinimize">
-        <!-- Conversations are loaded here -->
-        <div #messagebody class="direct-chat-messages">
-          <!-- Message. Default to the left -->
-
-          <!-- /.direct-chat-msg -->
-
-          <!-- Message to the right -->
-
-          <!-- /.direct-chat-msg -->
-
-          <div *ngFor="let item of messageArray">
-            <!-- Message to the right -->
-            <div
-              [ngClass]="{
-                'direct-chat-msg': true,
-                right: username === item.username
-              }"
-            >
-              <div class="direct-chat-info clearfix">
-                <span
-                  [ngClass]="{
-                    'direct-chat-name': true,
-                    'pull-right': username === item.username,
-                    'pull-left': username !== item.username
-                  }"
-                  >{{ item.username }}</span
-                >
-                <span
-                  [ngClass]="{
-                    'direct-chat-timestamp': true,
-                    'pull-right': username !== item.username,
-                    'pull-left': username === item.username
-                  }"
-                  >{{ item.created_at | date : "medium" }}</span
-                >
-              </div>
-              <!-- /.direct-chat-info -->
-              <img
-                class="direct-chat-img"
-                src="../../../assets/user_1.jpg"
-                alt="Message User Image"
-              />
-              <!-- /.direct-chat-img -->
-              <div class="direct-chat-text">
-                {{ item.message }}
-                <small class="pull-right">{{ item.status }}</small>
-              </div>
-              <!-- /.direct-chat-text -->
-            </div>
+        <div
+          *ngFor="let item of messageArray"
+          class="message-row"
+          [ngClass]="{ mine: username === item.username }"
+        >
+          <div class="message-meta">
+            <strong>{{ item.username }}</strong
+            ><span>{{ item.created_at | date: "shortTime" }}</span>
           </div>
-          <p class="typing" [hidden]="!usertyping">user is typing...</p>
+          <div class="message-bubble">
+            {{ item.message }} <small>{{ item.status }}</small>
+          </div>
         </div>
-        <!--/.direct-chat-messages-->
+        <p class="typing" [hidden]="!usertyping">Support team is typing...</p>
       </div>
-      <!-- /.box-body -->
-      <div class="box-footer" [hidden]="userMinimize">
-        <form action="#" method="post">
-          <div class="input-group">
-            <input
-              type="text"
-              name="message"
-              [(ngModel)]="message"
-              placeholder="Type Message ..."
-              class="form-control"
-              (keyup)="keySend($event)"
-              (focus)="userFocus()"
-            />
-            <span class="input-group-btn">
-              <button
-                type="button"
-                class="btn btn-primary btn-flat"
-                (click)="sendMessage()"
-              >
-                Send
-              </button>
-            </span>
-          </div>
-        </form>
-      </div>
-      <!-- /.box-footer-->
     </div>
-    <!--/.direct-chat -->
-  </div>
+    <footer class="composer" [hidden]="userMinimize">
+      <input
+        type="text"
+        name="message"
+        [(ngModel)]="message"
+        placeholder="Write a message..."
+        (keyup)="keySend($event)"
+        (focus)="userFocus()"
+      />
+      <button type="button" class="send-button" (click)="sendMessage()">
+        Send
+      </button>
+    </footer>
+  </section>
 </div>
