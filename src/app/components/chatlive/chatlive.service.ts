@@ -23,7 +23,7 @@ export class ChatliveService {
     this.options = config;
     console.log(config, "service");
     this.username = localStorage.getItem("username");
-    this.userRoom = parseInt(localStorage.getItem("userRoom"), 10);
+    this.userRoom = parseInt(localStorage.getItem("user_room"), 10);
   }
 
   openConnection() {

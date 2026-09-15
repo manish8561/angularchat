@@ -84,3 +84,8 @@ development.
 - `src/app/components/chatlive/` - Chat UI and Socket.IO client service
 - `server/server.js` - Express and Socket.IO server
 - `e2e/` - Protractor end-to-end tests
+
+
+You have to store in localstorge after login
+1. username 'unquie name of an user' like email.
+2. user_room increment number with each new user joined the room or user_id

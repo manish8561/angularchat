@@ -1,4 +1,10 @@
-import { Component, OnInit, ElementRef, ViewChild } from "@angular/core";
+import {
+  AfterViewChecked,
+  Component,
+  OnInit,
+  ElementRef,
+  ViewChild,
+} from "@angular/core";
 import { ChatliveService } from "./chatlive.service";
 
 @Component({
@@ -8,7 +14,7 @@ import { ChatliveService } from "./chatlive.service";
   styleUrls: ["./chatlive.component.scss"],
   // providers: [ChatliveService]
 })
-export class ChatliveComponent implements OnInit {
+export class ChatliveComponent implements OnInit, AfterViewChecked {
   display = false;
   admindisplay = false;
   adminRoom = 1;
@@ -28,19 +34,31 @@ export class ChatliveComponent implements OnInit {
   usercount = 0;
   usertyping = false;
   userMinimize = true;
+  private shouldScrollToLatest = false;
 
   @ViewChild("messagebody", { static: false }) myDiv: ElementRef;
   constructor(private readonly chatService: ChatliveService) {
     this.myDiv = new ElementRef(null);
-    this.adminRoom = chatService.options.adminRoom;
+    this.adminRoom = Number(chatService.options.admin_room);
     this.username = localStorage.getItem("username");
-    this.userRoom = localStorage.getItem("userRoom");
+    this.userRoom = Number(localStorage.getItem("user_room"));
   }
 
   ngOnInit() {
     if (this.username !== null && this.userRoom === this.adminRoom) {
       this.admindisplay = true;
     }
+  }
+
+  ngAfterViewChecked() {
+    if (!this.shouldScrollToLatest) {
+      return;
+    }
+
+    this.shouldScrollToLatest = false;
+    document.querySelectorAll<HTMLElement>(".message-list").forEach((list) => {
+      list.scrollTop = list.scrollHeight;
+    });
   }
   open() {
     this.chatService.openConnection();
@@ -64,16 +82,6 @@ export class ChatliveComponent implements OnInit {
     });
     this.chatService.newMessageRecevied().subscribe((data) => {
       this.addMessage(data);
-      setTimeout(() => {
-        if (this.admindisplay) {
-          document.querySelectorAll(".messagebody").forEach((ele) => {
-            ele.scrollTop = ele.scrollHeight;
-          });
-        } else {
-          this.myDiv.nativeElement.scrollTop =
-            this.myDiv.nativeElement.scrollHeight + 10;
-        }
-      }, 200);
     });
     if (this.userRoom === this.adminRoom) {
       this.chatService.newUser().subscribe((data) => {
@@ -105,6 +113,7 @@ export class ChatliveComponent implements OnInit {
         }
       }
     });
+    this.shouldScrollToLatest = true;
   }
   addTyping(data: any = {}) {
     if (this.username !== data.username) {
